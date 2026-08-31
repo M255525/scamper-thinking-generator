@@ -50,10 +50,9 @@ node --check _check.js
 
 ## 部署
 
-尚未推公開 GitHub repo / GitHub Pages（`.github/workflows/deploy-pages.yml` 尚未建立）。已初始化本機獨立 git repo。若後續要公開上線，比照 `mandala-thinking` 用 Actions workflow 部署（非 legacy branch-source）。
+已推公開 GitHub repo `M255525/scamper-thinking-generator`，用 `.github/workflows/deploy-pages.yml`（比照 `mandala-thinking` 逐字複製）以 Actions workflow 部署 GitHub Pages（非 legacy branch-source），已上線：<https://m255525.github.io/scamper-thinking-generator/>。
 
 ## 本次未做（後續視需要再處理）
 
 - 桌面版 exe 打包
 - 序號授權（使用者本次未要求；若之後要鎖工具，比照 `ai-prompt-generator` 的「鎖整個工具 12 個月」模式加回）
-- 推公開 GitHub repo 與 GitHub Pages 部署
