@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>操作手冊 · SCAMPER 創新思考法產生器</title>
+<style>
+  :root{
+    --bg:#180f13; --bg-alt:#1f1318; --panel:#26161d; --panel-raised:#2e1a22;
+    --line:#402530; --line-soft:#2f1b23; --text:#f7ecef; --text-dim:#c7a3ac; --text-faint:#8a6672;
+    --accent:#fb7185; --accent-glow:rgba(251,113,133,0.45); --red:#f87171;
+    --font-mono:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    --font-sans:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.75;}
+  a{color:var(--accent);}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 24px;
+    border-bottom:1px solid var(--line-soft);background:var(--bg-alt);position:sticky;top:0;z-index:10;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+  .topbar a.back{
+    font-family:var(--font-mono);font-size:13px;color:var(--text-dim);text-decoration:none;
+    border:1px solid var(--line);padding:7px 14px;border-radius:6px;
+  }
+  .topbar a.back:hover{color:var(--accent);border-color:var(--accent);}
+  main{max-width:720px;margin:0 auto;padding:44px 24px 80px;}
+  h1{font-size:30px;margin:0 0 8px;}
+  .sub{color:var(--text-dim);margin:0 0 36px;}
+  .card{
+    background:linear-gradient(180deg,var(--panel-raised),var(--panel));
+    border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin-bottom:20px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .card h2{font-size:19px;margin:0 0 14px;color:var(--accent);}
+  .card h3{font-size:15px;margin:18px 0 8px;color:var(--text);}
+  .card p, .card li{color:var(--text-dim);font-size:14.5px;}
+  .card ul, .card ol{padding-left:20px;margin:8px 0;}
+  .tip{
+    background:rgba(251,113,133,0.08);border:1px solid rgba(251,113,133,0.3);
+    border-radius:8px;padding:12px 16px;font-size:13.5px;color:var(--text-dim);margin-top:12px;
+  }
+  .warn{
+    background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.35);
+    border-radius:8px;padding:14px 16px;font-size:13.5px;color:var(--text-dim);
+  }
+  .warn strong{color:var(--red);}
+  code{background:var(--bg-alt);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:13px;}
+  footer{border-top:1px solid var(--line-soft);background:var(--bg-alt);padding:24px;text-align:center;font-size:12.5px;color:var(--text-faint);font-family:var(--font-mono);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span><strong>SCAMPER 創新思考法產生器</strong></div>
+  <a class="back" href="index.html">← 回到產生器</a>
+</div>
+
+<main>
+  <h1>操作手冊</h1>
+  <p class="sub">「SCAMPER 創新思考法產生器」把經典的 SCAMPER 創新思考法做成互動網頁：輸入一個現有產品、服務或問題，依 Substitute（替代）／Combine（合併）／Adapt（調整）／Modify（修改）／Put to Another Use（其他用途）／Eliminate（消除）／Reverse（重組）七個角度逐一發想創新點子，最後綜合評估選出最具潛力的前三個方案。所有欄位都可以直接點擊手動編輯，AI 只是加速發想的選用功能。</p>
+
+  <div class="card">
+    <h2>什麼是 SCAMPER</h2>
+    <p>SCAMPER 是七個創新提問角度的字首縮寫，逐一用不同角度「逼問」既有主題，避免思考卡在單一慣性方向：</p>
+    <ul>
+      <li><strong>S · Substitute 替代</strong>：有什麼元素、材料、角色、流程可以被替換掉？</li>
+      <li><strong>C · Combine 合併</strong>：可以把哪些功能、產品、團隊、步驟結合在一起？</li>
+      <li><strong>A · Adapt 調整</strong>：可以向哪個其他領域、案例、產業借鏡調整？</li>
+      <li><strong>M · Modify 修改（放大／縮小）</strong>：把某個特性放大、縮小、加強或弱化會怎樣？</li>
+      <li><strong>P · Put to Another Use 其他用途</strong>：現有資源還能用在什麼意想不到的地方？</li>
+      <li><strong>E · Eliminate 消除</strong>：拿掉哪個步驟、功能、限制之後反而更好？</li>
+      <li><strong>R · Reverse 重組／反轉</strong>：把順序、角色、因果邏輯顛倒會產生什麼可能？</li>
+    </ul>
+    <div class="tip">SCAMPER 的價值不在七個角度都要用力想出驚天動地的點子，而在「強迫換位置提問」——有些角度對某個主題特別有效，有些角度想不出來也沒關係，重點是七個角度都認真問過一輪。</div>
+  </div>
+
+  <div class="card">
+    <h2>操作步驟</h2>
+    <ol>
+      <li>在最上方「主題」欄位輸入想改造創新的產品、服務或問題，或直接點選下方 5 組內建範例快速開始（其中「巷口手沖咖啡吧」附完整手打示範內容）</li>
+      <li>手動點擊七構面卡片裡的欄位直接輸入 2-3 個點子，或展開「API 連線設定」填入你自己的 LLM API 金鑰後按「🧠 AI 一鍵展開全部七構面」，一次生成全部七構面的點子</li>
+      <li>對某一個構面的點子不滿意，可以只按該張卡片旁的「🧠 AI 重新生成此構面」單獨重來，不會動到其他構面；也可以按「＋新增點子」手動加一列</li>
+      <li>覺得特別有潛力的點子，按旁邊的「⭐選入前三」帶到下方「綜合評估」區塊，自行填寫理由與落地建議；也可以按「🧠 AI 綜合評估：選出前三方案」讓 AI 從你已填的點子中挑選並附上理由與建議</li>
+      <li>填寫「整體總評」總結這次拆解後最值得優先推動的方向</li>
+      <li>完成後可「複製為文字」、「下載 .txt」，或按「🖨 列印 / 存 PDF」輸出成報告</li>
+    </ol>
+    <div class="tip">所有內容自動存在這台瀏覽器的 localStorage，重新整理頁面不會遺失；不同電腦或清除瀏覽器資料就會不見，請自行下載 .txt 備份重要內容。「選入前三」是複製文字進去，之後刪除原始點子不會影響已選入的評估內容。</div>
+  </div>
+
+  <div class="card">
+    <h2>AI 功能（選用，需自備 API 金鑰）</h2>
+    <p>展開「API 連線設定」，選擇服務商（Claude／OpenAI／Gemini／OpenRouter），填入你自己申請的 API 金鑰；模型欄有預設值，也可以自行改成你想用的模型 ID。</p>
+    <ul>
+      <li>「🧠 AI 一鍵展開全部七構面」會依目前主題一次生成七構面共 14-21 個點子，直接覆蓋目前已填寫的內容（會先跳出確認）</li>
+      <li>每張構面卡片旁的「🧠 AI 重新生成此構面」只會重新生成該構面的點子，適合單一構面不滿意時局部重來</li>
+      <li>「🧠 AI 綜合評估：選出前三方案」會讀取你目前七構面裡已填的所有點子，選出最具商業價值或突破性的 3 個並附理由與落地建議，直接覆蓋整個綜合評估區塊</li>
+      <li>沒有填 API 金鑰完全不影響使用——所有欄位本來就可以直接手動編輯</li>
+    </ul>
+    <div class="tip">API 金鑰要自己到各服務商網站申請，使用時依你與該服務商的方案計費，本工具不會向你收費，也不會經手你的金鑰——金鑰只存在你這台電腦的瀏覽器，且直接連到服務商官方 API，不會經過本工具以外的任何伺服器。</div>
+  </div>
+
+  <div class="card">
+    <h2>隱私說明</h2>
+    <ul>
+      <li>你填寫的主題、七構面點子、綜合評估內容都只存在自己瀏覽器的 localStorage，關閉分頁後下次打開仍會保留，但不會傳送到任何伺服器；換一台電腦或清除瀏覽器資料就會不見，請自行用「下載 .txt」備份重要內容</li>
+      <li>API 金鑰同樣只存在瀏覽器的 localStorage；按下「AI 一鍵展開全部」「AI 重新生成此構面」或「AI 綜合評估」時，你的主題與已填內容會直接連線送到你選擇的服務商官方 API，不會經過本工具作者或任何第三方伺服器</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>使用警語</h2>
+    <div class="warn">
+      <strong>請注意：</strong>
+      <ul>
+        <li>本工具產生的 SCAMPER 創新方案（尤其是 AI 生成的部分）僅供發想參考，實際商業決策請自行評估查證</li>
+        <li>請勿在任何欄位輸入真實個資、公司機密、他人受著作權保護的內容，或不希望被 AI 服務留存的敏感資訊</li>
+        <li>AI 的回覆可能包含錯誤或過時資訊，使用前務必自行查證，特別是涉及法律、財務、醫療等專業判斷的情境</li>
+        <li>使用 AI 功能所產生的 API 費用由你與所選服務商的方案自行負擔，本工具不會向你收費</li>
+        <li>本工具與創作者不對使用本工具後所得之任何內容或後續決策結果負責</li>
+        <li>僅供教學、課程及個人使用，禁止未經授權公開發布、販售或商業化使用</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>創作者資料</h2>
+    <p><strong>Mark Tsai（蔡豐全）</strong></p>
+    <p>聯絡信箱：<a href="mailto:tsaimark@gmail.com">tsaimark@gmail.com</a></p>
+
+    <h3>專長</h3>
+    <p>銷售數據分析、AI 工具運用、政府補助計畫申請、創業、跨境電商</p>
+
+    <h3>證照</h3>
+    <ul>
+      <li>青創總會 創業輔導顧問師班（2013）</li>
+      <li>青創總會 網路行銷講師培訓班（2014）</li>
+      <li>阿里巴巴 P4P 認證講師（2016）</li>
+      <li>iCap 訓練規劃與評量職能基準課程（2017）</li>
+      <li>iCap 職能導向課程申請認證實作班（2023）</li>
+      <li>iPAS AI 應用規劃師－初級（2025）</li>
+      <li>新北市社會局社區數位陪伴員（2025）</li>
+    </ul>
+
+    <h3>經歷</h3>
+    <ul>
+      <li>勞動力發展署桃竹苗分署 創業顧問（2017－迄今）</li>
+      <li>勞動力發展署（北北基）小型企業人力提升計畫 顧問（2019－迄今）</li>
+      <li>勞動力發展署（桃竹苗）小型企業人力提升計畫 顧問（2019－迄今）</li>
+      <li>農業部農業科技司「科技農企業雙軸轉型躍升發展」科技計畫 業師（2025－2026）</li>
+      <li>勞動力發展署 企業人力資源提升計畫 審查委員（2024）</li>
+      <li>勞動力發展署 職前訓練評鑑計畫 委員（2022）</li>
+      <li>勞動部桃竹苗分署－桃竹苗區域運籌人力資源整合服務計畫 顧問（2022－2023）</li>
+      <li>經濟部中小企業處 SBIR 海選專案 評審委員（2019－2024）</li>
+      <li>勞動力發展署 數位學習課程清單審查會議 審查委員（2024－2025）</li>
+      <li>輔仁大學創新跨領域學院 課務委員（2024－2025）</li>
+      <li>台北市進出口商業同業公會 跨境電商生態村 顧問</li>
+      <li>台灣網商協會 顧問</li>
+      <li>中華職能開發策進會 顧問（2018－2020）</li>
+      <li>新北市汽車美容人員職業工會 顧問（2023－迄今）</li>
+      <li>中華網路行銷講師協會 顧問（2022－迄今）</li>
+      <li>新北市社企電商基地 輔導顧問（2018－2020）</li>
+      <li>阿里巴巴國際站平台 認證講師（2016）</li>
+      <li>巨匠電腦 跨境電子商務班 講師（2016－2017）</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>授權與使用限制</h2>
+    <p>本工具僅供<strong>教學、課程及個人使用</strong>，禁止未經授權公開發布、販售或商業化使用。如需其他用途，請先取得創作者授權。</p>
+  </div>
+
+</main>
+
+<footer>
+  製作：Mark Tsai｜<a href="index.html">回到產生器</a>
+</footer>
+
+</body>
+</html>

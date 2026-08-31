@@ -1,0 +1,16 @@
+{
+  "name": "SCAMPER 創新思考法產生器",
+  "short_name": "SCAMPER創新",
+  "description": "輸入主題，用 SCAMPER 七構面拆解成創新點子，可手動編輯，也可串接 AI 一鍵生成與綜合評估",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#180f13",
+  "theme_color": "#9f1239",
+  "lang": "zh-TW",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
