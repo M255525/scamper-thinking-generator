@@ -15,7 +15,9 @@
   - 每張構面卡片旁「🧠 AI 重新生成此構面」：`regenerateFacet(key)` 只呼叫 `buildFacetPrompt()`（帶入其餘構面現有內容當上下文避免重複），只覆蓋該構面。
   - 「🧠 AI 綜合評估：選出前三方案」：`buildEvaluationPrompt()` 統整全部已填點子（帶構面標籤）要求 AI 選前 3 名＋理由＋落地建議＋總評。
 - **匯出**：`buildFullText()` 把主題＋七構面點子（含中英文構面名）＋綜合評估前三＋理由＋建議＋總評組成純文字，供「複製為文字」「下載 .txt」使用；「🖨 列印 / 存 PDF」走 `window.print()` + `@media print` 樣式。
+- **儲存為檔案／開啟檔案**（2026-09-07 新增，與 `localStorage` 自動儲存互補，供跨電腦備份/搬移）：「💾 儲存為檔案」把整個 `state`（主題＋七構面＋綜合評估）存成 `.json`；「📂 開啟檔案」讀回後透過 `normalizeState()`（從 `loadState()` 抽出的共用正規化函式）套用同一套欄位補齊/型別轉換規則，避免格式不符的檔案讓畫面壞掉。
 - **列印/PDF 浮水印**：`#printWatermark`，與 `mandala-thinking`/`six-thinking-hats-generator`/`new-product-strategy-studio` 等共用同一張「馬克老師」品牌 base64 PNG（未經對話視窗，用 Bash `sed` 直接從原始檔抽出該行字串複製過來）。
+- **列印時 textarea 內文被裁切的修法**（2026-09-07修）：純 CSS（`overflow:visible`／`height:auto`）對 `<textarea>` 無效——瀏覽器不會依內容自動撐開 textarea 的高度。改用 `beforeprint`/`afterprint` 事件監聽，列印前把每個 `<textarea>` 的高度暫時設成 `scrollHeight`（記錄原本 inline height 供還原），列印後還原；已用瀏覽器工具實測撐開/還原高度皆正確。此問題**在其餘同樣大量用 `<textarea>` 的姊妹工具（`mandala-thinking`／`six-thinking-hats-generator`／`new-product-strategy-studio` 等）應該也存在**，尚未回頭修，之後有人反映同樣症狀可比照套用本次的解法。
 
 ## 與姊妹專案的差異
 

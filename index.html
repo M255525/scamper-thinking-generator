@@ -203,7 +203,7 @@
     body{background:#fff;color:#000;padding-top:0 !important;}
     .panel{border:1px solid #999;break-inside:avoid;}
     .facet-card,.eval-slot{border:1px solid #999;background:#fff;}
-    textarea{color:#000 !important;}
+    textarea{color:#000 !important;overflow:visible !important;resize:none !important;}
     #printWatermark{
       display:flex !important;align-items:center;justify-content:center;overflow:hidden;
       position:fixed;inset:0;z-index:9999;pointer-events:none;
@@ -299,8 +299,12 @@
     <div class="output-actions">
       <button class="btn primary" id="copyAllBtn" type="button">複製為文字</button>
       <button class="btn ghost" id="downloadBtn" type="button">下載 .txt</button>
+      <button class="btn ghost" id="saveFileBtn" type="button">💾 儲存為檔案</button>
+      <button class="btn ghost" id="loadFileBtn" type="button">📂 開啟檔案</button>
+      <input type="file" id="loadFileInput" accept="application/json,.json" style="display:none;">
       <button class="btn ghost" id="printBtn" type="button">🖨 列印 / 存 PDF</button>
     </div>
+    <p class="panel-hint" style="margin-top:8px;">「儲存為檔案」會把目前主題、七構面點子與綜合評估整包存成一個 .json 檔，日後可用「開啟檔案」在任何一台電腦重新載入繼續編輯（跟只存在這台瀏覽器裡的自動儲存不同）。</p>
   </section>
 
 </main>
@@ -635,24 +639,25 @@
       evaluation: {top3: [emptyEvalSlot(), emptyEvalSlot(), emptyEvalSlot()], summary: ''}
     };
   }
+  function normalizeState(raw){
+    if(!raw || typeof raw.scamper !== 'object') return defaultState();
+    var d = defaultState();
+    d.topic = raw.topic || '';
+    FACETS.forEach(function(f){
+      var arr = raw.scamper && raw.scamper[f.key];
+      d.scamper[f.key] = (Array.isArray(arr) && arr.length) ? arr.map(String) : [''];
+    });
+    var top3raw = (raw.evaluation && Array.isArray(raw.evaluation.top3)) ? raw.evaluation.top3 : [];
+    d.evaluation.top3 = [0, 1, 2].map(function(i){
+      var s = top3raw[i] || {};
+      return {facet: s.facet || '', idea: s.idea || '', reason: s.reason || '', action: s.action || ''};
+    });
+    d.evaluation.summary = (raw.evaluation && raw.evaluation.summary) || '';
+    return d;
+  }
   function loadState(){
-    try{
-      var raw = JSON.parse(localStorage.getItem(STATE_KEY));
-      if(!raw || typeof raw.scamper !== 'object') return defaultState();
-      var d = defaultState();
-      d.topic = raw.topic || '';
-      FACETS.forEach(function(f){
-        var arr = raw.scamper && raw.scamper[f.key];
-        d.scamper[f.key] = (Array.isArray(arr) && arr.length) ? arr.map(String) : [''];
-      });
-      var top3raw = (raw.evaluation && Array.isArray(raw.evaluation.top3)) ? raw.evaluation.top3 : [];
-      d.evaluation.top3 = [0, 1, 2].map(function(i){
-        var s = top3raw[i] || {};
-        return {facet: s.facet || '', idea: s.idea || '', reason: s.reason || '', action: s.action || ''};
-      });
-      d.evaluation.summary = (raw.evaluation && raw.evaluation.summary) || '';
-      return d;
-    }catch(e){ return defaultState(); }
+    try{ return normalizeState(JSON.parse(localStorage.getItem(STATE_KEY))); }
+    catch(e){ return defaultState(); }
   }
   function persistState(){
     try{ localStorage.setItem(STATE_KEY, JSON.stringify(state)); }catch(e){}
@@ -1164,7 +1169,50 @@
     URL.revokeObjectURL(url);
     showToast('已下載「' + name + '.txt」');
   });
+  $('saveFileBtn').addEventListener('click', function(){
+    var name = (state.topic || 'SCAMPER創新思考').replace(/[\\/:*?"<>|]/g, '').trim() || 'SCAMPER創新思考';
+    var blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('已儲存「' + name + '.json」');
+  });
+  $('loadFileBtn').addEventListener('click', function(){ $('loadFileInput').click(); });
+  $('loadFileInput').addEventListener('change', function(){
+    var file = this.files && this.files[0];
+    this.value = '';
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var raw = JSON.parse(reader.result);
+        state = normalizeState(raw);
+        persistState();
+        renderAll();
+        showToast('已載入「' + file.name + '」');
+      }catch(e){ showToast('檔案格式錯誤，無法載入'); }
+    };
+    reader.onerror = function(){ showToast('讀取檔案失敗'); };
+    reader.readAsText(file);
+  });
   $('printBtn').addEventListener('click', function(){ window.print(); });
+
+  /* 列印前把所有 textarea 撐開到完整內容高度，避免捲軸內的文字被裁切看不到；列印後還原 */
+  window.addEventListener('beforeprint', function(){
+    document.querySelectorAll('textarea').forEach(function(ta){
+      ta.dataset.printPrevHeight = ta.style.height || '';
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    });
+  });
+  window.addEventListener('afterprint', function(){
+    document.querySelectorAll('textarea').forEach(function(ta){
+      ta.style.height = ta.dataset.printPrevHeight || '';
+      delete ta.dataset.printPrevHeight;
+    });
+  });
 
   /* ---------- 初始化 ---------- */
   renderPresets();
