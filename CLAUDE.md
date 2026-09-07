@@ -17,7 +17,12 @@
 - **匯出**：`buildFullText()` 把主題＋七構面點子（含中英文構面名）＋綜合評估前三＋理由＋建議＋總評組成純文字，供「複製為文字」「下載 .txt」使用；「🖨 列印 / 存 PDF」走 `window.print()` + `@media print` 樣式。
 - **儲存為檔案／開啟檔案**（2026-09-07 新增，與 `localStorage` 自動儲存互補，供跨電腦備份/搬移）：「💾 儲存為檔案」把整個 `state`（主題＋七構面＋綜合評估）存成 `.json`；「📂 開啟檔案」讀回後透過 `normalizeState()`（從 `loadState()` 抽出的共用正規化函式）套用同一套欄位補齊/型別轉換規則，避免格式不符的檔案讓畫面壞掉。
 - **列印/PDF 浮水印**：`#printWatermark`，與 `mandala-thinking`/`six-thinking-hats-generator`/`new-product-strategy-studio` 等共用同一張「馬克老師」品牌 base64 PNG（未經對話視窗，用 Bash `sed` 直接從原始檔抽出該行字串複製過來）。
-- **列印時 textarea 內文被裁切的修法**（2026-09-07修）：純 CSS（`overflow:visible`／`height:auto`）對 `<textarea>` 無效——瀏覽器不會依內容自動撐開 textarea 的高度。改用 `beforeprint`/`afterprint` 事件監聽，列印前把每個 `<textarea>` 的高度暫時設成 `scrollHeight`（記錄原本 inline height 供還原），列印後還原；已用瀏覽器工具實測撐開/還原高度皆正確。此問題**在其餘同樣大量用 `<textarea>` 的姊妹工具（`mandala-thinking`／`six-thinking-hats-generator`／`new-product-strategy-studio` 等）應該也存在**，尚未回頭修，之後有人反映同樣症狀可比照套用本次的解法。
+- **列印時 textarea 內文被裁切的修法**（2026-09-07修，共兩輪）：
+  - 第一輪（不夠完整）：純 CSS（`overflow:visible`／`height:auto`）對 `<textarea>` 無效——瀏覽器不會依內容自動撐開 textarea 高度，改用 `beforeprint` 把 `ta.style.height` 設成 `ta.scrollHeight`。這個做法對短內容（如各構面「第1個點子」）有效，但使用者實測回報「整體總評」欄位仍被裁切。
+  - **根因**：`scrollHeight` 是在**螢幕編輯寬度**下量測的，但列印/PDF 的實際版面寬度比螢幕窄很多；同一段文字在較窄版面會換行成更多行，需要的高度比螢幕量到的高。內容越長（尤其「整體總評」這種多行長文），螢幕與列印寬度換行行數差距就越大，才會出現「有改善但特定欄位還是有問題」的現象。已用 Playwright 產生實際 PDF（不是螢幕截圖）比對驗證此根因。
+  - **第二輪修法（已驗證正確）**：改用 `beforeprint` 把每個 `<textarea>` 換成同位置的 `<div class="print-textarea-mirror">`（`white-space:pre-wrap`，`textContent = 原值`），print CSS 隱藏 textarea 只顯示 mirror div；`afterprint` 移除所有 mirror div 還原。原理：`<div>` 不是 textarea 這種 replaced element，會依印表機當下的實際版面寬度自然換行撐高，不受量測時機/版面寬度差異影響。已用 Playwright `page.pdf()` 產生真實 PDF 驗證：30 行長文字的「整體總評」完整顯示且正確跨頁，無裁切。
+  - 此類問題**在其餘同樣大量用 `<textarea>` 的姊妹工具（`mandala-thinking`／`six-thinking-hats-generator`／`new-product-strategy-studio` 等）應該也存在**，尚未回頭修；之後有人反映同樣症狀，直接套用這個「textarea→mirror div」解法，不要只套第一輪的 `scrollHeight` 解法（對長文字不夠用）。
+  - **除錯教訓**：驗證列印/PDF 問題不能只靠螢幕截圖或手動 `dispatchEvent('beforeprint')`——那樣量到的仍是螢幕寬度下的尺寸，看起來正常但實際列印仍會裁切。要嘛用 Playwright `page.pdf()` 產生真正的 PDF 再讀取確認，要嘛注意：不要在瀏覽器自動化裡真的點擊觸發 `window.print()`／存 PDF 按鈕——會開啟原生列印對話框，把該分頁的 CDP 連線凍結到必須手動關閉對話框才能恢復（這次測試中發生過一次）。
 
 ## 與姊妹專案的差異
 

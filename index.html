@@ -198,12 +198,18 @@
   }
 
   #printWatermark{display:none;}
+  .print-textarea-mirror{display:none;}
   @media print{
     #marqueeBar,.topbar,.hero .preset-row,.hero .signature-strip,.ai-panel,.output-actions,footer,#toast,.facet-card-actions,.idea-row .idea-actions{display:none !important;}
     body{background:#fff;color:#000;padding-top:0 !important;}
     .panel{border:1px solid #999;break-inside:avoid;}
     .facet-card,.eval-slot{border:1px solid #999;background:#fff;}
-    textarea{color:#000 !important;overflow:visible !important;resize:none !important;}
+    textarea{display:none !important;}
+    .print-textarea-mirror{
+      display:block !important;white-space:pre-wrap;word-break:break-word;
+      color:#000;background:#fff;border:1px solid #999;border-radius:8px;
+      padding:10px 12px;font-family:inherit;font-size:14px;line-height:1.6;min-height:20px;
+    }
     #printWatermark{
       display:flex !important;align-items:center;justify-content:center;overflow:hidden;
       position:fixed;inset:0;z-index:9999;pointer-events:none;
@@ -1199,19 +1205,22 @@
   });
   $('printBtn').addEventListener('click', function(){ window.print(); });
 
-  /* 列印前把所有 textarea 撐開到完整內容高度，避免捲軸內的文字被裁切看不到；列印後還原 */
+  /* 列印前把每個 textarea 換成一個依內容自動撐高的 <div> 鏡像，列印後移除還原。
+     （改用 scrollHeight 動態撐高 textarea 高度的做法看似可行，但列印用的紙張版面寬度比螢幕編輯寬度窄很多，
+     文字會換行換得更多行，而 scrollHeight 是在螢幕寬度下量測的，換成印表機寬度後反而不夠高、還是會被裁切；
+     一般 <div> 不是 textarea 這種「replaced element」，會依印表機當下的實際版面寬度自然換行撐高，不會有這個問題。） */
   window.addEventListener('beforeprint', function(){
     document.querySelectorAll('textarea').forEach(function(ta){
-      ta.dataset.printPrevHeight = ta.style.height || '';
-      ta.style.height = 'auto';
-      ta.style.height = ta.scrollHeight + 'px';
+      var mirror = document.createElement('div');
+      mirror.className = 'print-textarea-mirror';
+      mirror.textContent = ta.value || ta.placeholder || '';
+      ta.insertAdjacentElement('afterend', mirror);
+      ta.dataset.printMirrored = '1';
     });
   });
   window.addEventListener('afterprint', function(){
-    document.querySelectorAll('textarea').forEach(function(ta){
-      ta.style.height = ta.dataset.printPrevHeight || '';
-      delete ta.dataset.printPrevHeight;
-    });
+    document.querySelectorAll('.print-textarea-mirror').forEach(function(el){ el.remove(); });
+    document.querySelectorAll('textarea[data-print-mirrored]').forEach(function(ta){ delete ta.dataset.printMirrored; });
   });
 
   /* ---------- 初始化 ---------- */
