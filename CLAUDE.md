@@ -24,6 +24,10 @@
   - 此類問題**在其餘同樣大量用 `<textarea>` 的姊妹工具（`mandala-thinking`／`six-thinking-hats-generator`／`new-product-strategy-studio` 等）應該也存在**，尚未回頭修；之後有人反映同樣症狀，直接套用這個「textarea→mirror div」解法，不要只套第一輪的 `scrollHeight` 解法（對長文字不夠用）。
   - **除錯教訓**：驗證列印/PDF 問題不能只靠螢幕截圖或手動 `dispatchEvent('beforeprint')`——那樣量到的仍是螢幕寬度下的尺寸，看起來正常但實際列印仍會裁切。要嘛用 Playwright `page.pdf()` 產生真正的 PDF 再讀取確認，要嘛注意：不要在瀏覽器自動化裡真的點擊觸發 `window.print()`／存 PDF 按鈕——會開啟原生列印對話框，把該分頁的 CDP 連線凍結到必須手動關閉對話框才能恢復（這次測試中發生過一次）。
 
+## 淺色／深色主題切換（2026-09-16 新增）
+
+topbar 新增 `#themeToggleBtn`（🌙 深色／☀️ 淺色），切換 `<html data-theme="light">` 即整站換色，選擇存 `localStorage`（key `scamperTheme`），做法與同日在 `ai-prompt-generator` 加上的機制完全一致（改動時互相參照），`<head>` 內嵌早期同步 script 避免換頁閃色。**關鍵設計**：`--accent`（玫瑰紅）／`--amber` 這兩個色相同時當文字色（連結、徽章文字、分頁 active 態）與按鈕實心背景（`.btn.primary`／`.btn.amber`，固定深色字 ink）——淺色主題把兩者都調深（accent `#fb7185→#be123c`、amber `#e8a33d→#92400e`）並把按鈕 ink 抽成 `--ink` 變數（深色主題維持近黑 `#2a0a12`、淺色主題改 `#ffffff`），讓同一色相在「白底文字」與「按鈕背景配白字」兩種用途下都維持約 5.9~7.1:1 對比（已用 Playwright 算出精確 WCAG 對比值驗證，含 `--text`/`--text-dim`/`--text-faint`/`--red`/`--warn` 全部欄位）。`--accent-soft`／`--accent-glow`／`--amber-soft` 全部改成 `color-mix(in srgb, var(--accent) N%, transparent)` 動態算出（原本寫死 rgba），淺色主題不需要另外重新定義。新增 `--warn` token 取代原本寫死在 `.ai-report .warn` 的亮黃 `#facc15`（在白底上對比極差），淺色主題覆寫為 `#92400e`；`--red` 淺色主題覆寫為 `#dc2626`（原本粉紅 `#f87171` 在白底上過淺）。body 背景格線也從寫死 rgba 改用 `color-mix()`。**列印/PDF 樣式（`@media print`）不受影響**——那段本來就寫死 `#fff`/`#000`，跟畫面上的淺色/深色主題切換是兩個獨立系統。
+
 ## 與姊妹專案的差異
 
 - **不加序號授權機制**——比照 `mandala-thinking`/`coffee-ig-planner`/`social-post-grader` 的先例，這是「思考框架練習工具」類別而非「商業文件產生器」類別，使用者本次未要求鎖工具。

@@ -2,6 +2,15 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
+<script>
+/* 盡早套用主題，避免換頁時先閃一下預設深色配色再切換成淺色 */
+(function(){
+  try{
+    var t = localStorage.getItem('scamperTheme');
+    if(t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  }catch(e){}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SCAMPER 創新思考法產生器 · 七構面拆解重組</title>
 <link rel="manifest" href="manifest.json">
@@ -23,26 +32,48 @@
     --text-dim:#c7a3ac;
     --text-faint:#8a6672;
     --accent:#fb7185;
-    --accent-soft:rgba(251,113,133,0.14);
-    --accent-glow:rgba(251,113,133,0.45);
+    --accent-soft:color-mix(in srgb, var(--accent) 14%, transparent);
+    --accent-glow:color-mix(in srgb, var(--accent) 45%, transparent);
     --amber:#e8a33d;
-    --amber-soft:rgba(232,163,61,0.14);
+    --amber-soft:color-mix(in srgb, var(--amber) 14%, transparent);
     --red:#f87171;
+    --warn:#facc15;
+    --ink:#2a0a12;
     --font-mono:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,"Liberation Mono",monospace;
     --font-sans:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
     --radius:10px;
+  }
+  /* ---------- 淺色主題（切換 <html data-theme="light"> 即可整站換色）；
+     accent/amber 在淺色主題改用更深飽和的色階，確保直接當文字色時在白底面板上仍有足夠對比，
+     其餘 -soft/-glow 皆用 color-mix() 從 accent/amber 動態算出，不需要另外維護一份淺色 rgba ---------- */
+  :root[data-theme="light"]{
+    --bg:#fdf3f1;
+    --bg-alt:#f9e6e2;
+    --panel:#ffffff;
+    --panel-raised:#fdf0ee;
+    --line:#eccbc4;
+    --line-soft:#f3ddd8;
+    --text:#1f0d11;
+    --text-dim:#6b4048;
+    --text-faint:#96707a;
+    --accent:#be123c;
+    --amber:#92400e;
+    --red:#dc2626;
+    --warn:#92400e;
+    --ink:#ffffff;
   }
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;}
   body{
     margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.65;min-height:100vh;
     background-image:
-      linear-gradient(rgba(251,113,133,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(251,113,133,0.035) 1px, transparent 1px);
+      linear-gradient(color-mix(in srgb, var(--accent) 3.5%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--accent) 3.5%, transparent) 1px, transparent 1px);
     background-size:34px 34px;
+    transition:background-color .2s,color .2s;
   }
   a{color:var(--accent);}
-  ::selection{background:var(--accent);color:#2a0a12;}
+  ::selection{background:var(--accent);color:var(--ink);}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
   .btn{
@@ -51,10 +82,10 @@
     padding:9px 16px;border-radius:6px;cursor:pointer;transition:.15s;
   }
   .btn:hover{border-color:var(--accent);color:var(--accent);}
-  .btn.primary{background:var(--accent);color:#2a0a12;border-color:var(--accent);font-weight:700;}
-  .btn.primary:hover{background:#fda4af;color:#2a0a12;box-shadow:0 0 16px var(--accent-glow);}
-  .btn.amber{background:var(--amber);color:#2a1a04;border-color:var(--amber);font-weight:700;}
-  .btn.amber:hover{background:#f2b95c;box-shadow:0 0 16px rgba(232,163,61,.5);}
+  .btn.primary{background:var(--accent);color:var(--ink);border-color:var(--accent);font-weight:700;}
+  .btn.primary:hover{background:color-mix(in srgb, var(--accent) 80%, white);color:var(--ink);box-shadow:0 0 16px var(--accent-glow);}
+  .btn.amber{background:var(--amber);color:var(--ink);border-color:var(--amber);font-weight:700;}
+  .btn.amber:hover{background:color-mix(in srgb, var(--amber) 80%, white);box-shadow:0 0 16px color-mix(in srgb, var(--amber) 50%, transparent);}
   .btn.ghost{background:transparent;}
   .btn.danger:hover{border-color:var(--red);color:var(--red);}
   .btn:disabled{opacity:.45;cursor:not-allowed;}
@@ -86,8 +117,9 @@
   .brand{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);letter-spacing:.04em;}
   .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
   .brand strong{font-size:15px;font-weight:700;}
-  .topbar nav a{font-family:var(--font-mono);font-size:13px;color:var(--text-dim);text-decoration:none;border:1px solid var(--line);padding:7px 14px;border-radius:6px;transition:.15s;}
-  .topbar nav a:hover{color:var(--accent);border-color:var(--accent);}
+  .topbar nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .topbar nav a, .topbar nav button{font-family:var(--font-mono);font-size:13px;color:var(--text-dim);text-decoration:none;border:1px solid var(--line);padding:7px 14px;border-radius:6px;transition:.15s;background:transparent;cursor:pointer;}
+  .topbar nav a:hover, .topbar nav button:hover{color:var(--accent);border-color:var(--accent);}
 
   /* ---------- hero ---------- */
   .hero{padding:44px 24px 26px;text-align:center;border-bottom:1px solid var(--line-soft);background:linear-gradient(180deg, var(--bg-alt), var(--bg));}
@@ -128,7 +160,7 @@
   .topic-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
   .topic-row input{flex:1;min-width:220px;font-size:16px;font-weight:700;}
 
-  .ai-panel{border-color:rgba(232,163,61,.35);}
+  .ai-panel{border-color:color-mix(in srgb, var(--amber) 35%, transparent);}
   .ai-panel .panel-title .badge{background:var(--amber-soft);color:var(--amber);}
   .api-settings{margin-bottom:14px;}
   .api-settings summary{cursor:pointer;font-family:var(--font-mono);font-size:12.5px;color:var(--text-dim);}
@@ -138,7 +170,7 @@
   .api-note{font-size:11.5px;color:var(--text-faint);margin-top:8px;line-height:1.6;}
   .ai-report{margin-top:10px;font-size:12.5px;}
   .ai-report .ok{color:var(--accent);}
-  .ai-report .warn{color:#facc15;}
+  .ai-report .warn{color:var(--warn);}
   .ai-report .bad{color:var(--red);}
   .ai-actions{display:flex;gap:10px;flex-wrap:wrap;}
 
@@ -230,7 +262,10 @@
 
 <div class="topbar">
   <div class="brand"><span class="dot"></span><strong>SCAMPER 創新思考法產生器</strong></div>
-  <nav><a href="manual.html">操作手冊</a></nav>
+  <nav>
+    <button type="button" id="themeToggleBtn" aria-label="切換淺色／深色主題">🌙 深色</button>
+    <a href="manual.html">操作手冊</a>
+  </nav>
 </div>
 
 <div class="hero">
@@ -477,6 +512,34 @@ function geminiModelFix(m){var r={'gemini-2.5-flash': 'gemini-3.6-flash', 'gemin
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
       navigator.serviceWorker.register('service-worker.js').catch(function () {});
+    });
+  }
+})();
+
+/* ================= 淺色／深色主題切換（獨立運作，跟下方主程式邏輯無關） ================= */
+(function () {
+  'use strict';
+  var STORAGE_KEY = 'scamperTheme';
+  var THEME_COLOR = { dark: '#9f1239', light: '#be123c' };
+  var btn = document.getElementById('themeToggleBtn');
+
+  function apply(theme, persist) {
+    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    else document.documentElement.removeAttribute('data-theme');
+    if (btn) btn.textContent = theme === 'light' ? '☀️ 淺色' : '🌙 深色';
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', THEME_COLOR[theme] || THEME_COLOR.dark);
+    if (persist) { try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) {} }
+  }
+
+  var saved = 'dark';
+  try { saved = localStorage.getItem(STORAGE_KEY) === 'light' ? 'light' : 'dark'; } catch (e) {}
+  apply(saved, false);
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      apply(current === 'light' ? 'dark' : 'light', true);
     });
   }
 })();
